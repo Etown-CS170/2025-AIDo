@@ -6,7 +6,7 @@ import { useState } from "react";
 const NAV_ITEMS = [
   { key: "generate", label: "GENERATE" },
   { key: "chat", label: "CHAT" },
-  { key: "home", label: "HOME" },
+  { key: "ai-do", label: "AI-DO" },
   { key: "calendar", label: "CALENDAR" },
   { key: "budget", label: "BUDGET" },
 ] as const;
@@ -19,7 +19,7 @@ const FOOT_ITEMS = [
 type NavKey = typeof NAV_ITEMS[number]["key"];
 
 export default function App() {
-  const [active, setActive] = useState<NavKey>("home");
+  const [active, setActive] = useState<NavKey>("ai-do");
 
   return (
     <div className="min-h-screen bg-white text-slate-800">
@@ -48,7 +48,7 @@ export default function App() {
       </header>
 
       {/* Informational Home Section */}
-      <main className="mx-auto max-w-5xl px-6 py-16">
+      <main className="mx-auto max-w-5xl px-6 py-16 pb-24">
         <section className="rounded-3xl border border-slate-200/70 p-8 shadow-sm">
           <h1 className="text-4xl font-bold tracking-tight">Welcome to AI‑Do</h1>
           <p className="mt-3 text-lg text-slate-600">
@@ -66,7 +66,7 @@ export default function App() {
 
           {/* Active tab mock content */}
           <div className="mt-10 rounded-2xl border border-slate-200/70 bg-white p-6">
-            {active === "home" && (
+            {active === "ai-do" && (
               <div>
                 <h2 className="text-2xl font-semibold">Home Overview</h2>
                 <p className="mt-2 text-slate-600">Get a snapshot of your budget, timeline, and next steps.</p>
@@ -102,22 +102,29 @@ export default function App() {
 
 
       {/* Footer */}
-      <header className="fixed bottom-0 z-50 w-full border-b border-rose-100/60 bg-rose-100/60 backdrop-blur supports-[backdrop-filter]:bg-rose-100/40">
-       <nav className="mx-auto flex max-w-6xl items-center justify-center px-4">
-        <ul className="flex w-full max-w-3xl items-center justify-between gap-6 py-4">
-          {FOOT_ITEMS.map((item) => (
-            <li key={item.key} className="">
-              <button>
-                {item.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-       </nav>
-      </header>
-      {/* <footer className="mx-auto max-w-5xl px-6 pb-16 text-center text-sm text-slate-500">
-        © {new Date().getFullYear()} AI‑Do
-      </footer> */}
+      <footer className="fixed bottom-0 z-50 w-full border-t border-rose-100/60 bg-rose-100/60 backdrop-blur supports-[backdrop-filter]:bg-rose-100/40">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          {/* Empty space for balance */}
+          <div className="w-20"></div>
+          
+          {/* Centered Logo */}
+          <div className="flex items-center justify-center">
+            <img 
+              src="/AI-Do-Logo.png" 
+              alt="AI-Do Logo" 
+              className="h-8 w-auto"
+            />
+          </div>
+          
+          {/* Logout Button */}
+          <button
+            onClick={() => console.log('Logout clicked')}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-white/50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+          >
+            LOGOUT
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
