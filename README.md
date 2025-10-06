@@ -4,7 +4,7 @@ A-I Do is a wedding planning assistant that takes couples from ‘Yes’ to ‘I
 ### Getting Started
 1. Clone the repository
 ```
-git clone <repository_url>
+git clone https://github.com/Etown-CS170/2025-AIDo.git
 ```
 2. Check requirements (Node > 18)
 ```
