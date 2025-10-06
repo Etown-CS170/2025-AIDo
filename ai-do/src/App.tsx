@@ -48,56 +48,12 @@ export default function App() {
       </header>
 
       {/* Informational Home Section */}
-      <main className="mx-auto max-w-5xl px-6 py-16 pb-24">
-        <section className="rounded-3xl border border-slate-200/70 p-8 shadow-sm">
-          <h1 className="text-4xl font-bold tracking-tight">Welcome to AI‑Do</h1>
-          <p className="mt-3 text-lg text-slate-600">
-            Your all‑in‑one wedding planning assistant. Stay on top of tasks, budget
-            wisely, and create beautiful inspiration — all from one place.
-          </p>
-
-          {/* Quick feature cards */}
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <FeatureCard title="Generate" desc="Create décor & invite mockups with the Creative Assistant." icon="🖼️" active={active === "generate"} />
-            <FeatureCard title="Chat" desc="Ask planning questions 24/7 with the AI Chatbot." icon="💬" active={active === "chat"} />
-            <FeatureCard title="Calendar" desc="Deadlines and milestones auto‑organized for you." icon="📅" active={active === "calendar"} />
-            <FeatureCard title="Budget" desc="Track categories and visualize spend vs. plan." icon="💸" active={active === "budget"} />
-          </div>
-
-          {/* Active tab mock content */}
-          <div className="mt-10 rounded-2xl border border-slate-200/70 bg-white p-6">
-            {active === "ai-do" && (
-              <div>
-                <h2 className="text-2xl font-semibold">Home Overview</h2>
-                <p className="mt-2 text-slate-600">Get a snapshot of your budget, timeline, and next steps.</p>
-              </div>
-            )}
-            {active === "generate" && (
-              <div>
-                <h2 className="text-2xl font-semibold">Creative Assistant</h2>
-                <p className="mt-2 text-slate-600">Describe your vibe; we’ll generate mood boards & mockups.</p>
-              </div>
-            )}
-            {active === "chat" && (
-              <div>
-                <h2 className="text-2xl font-semibold">AI Chatbot</h2>
-                <p className="mt-2 text-slate-600">Ask planning questions and get guided checklists instantly.</p>
-              </div>
-            )}
-            {active === "calendar" && (
-              <div>
-                <h2 className="text-2xl font-semibold">Calendar</h2>
-                <p className="mt-2 text-slate-600">Milestones, vendor due dates, and reminders in one view.</p>
-              </div>
-            )}
-            {active === "budget" && (
-              <div>
-                <h2 className="text-2xl font-semibold">Smart Budget</h2>
-                <p className="mt-2 text-slate-600">Allocate, track, and visualize spend across categories.</p>
-              </div>
-            )}
-          </div>
-        </section>
+      <main className="flex-grow mx-auto max-w-5xl px-6 py-16 pb-24">
+        {active === "ai-do" && <AiDoHome />}
+        {active === "generate" && <PlaceholderPage title="Generate" />}
+        {active === "chat" && <PlaceholderPage title="Chat" />}
+        {active === "calendar" && <PlaceholderPage title="Calendar" />}
+        {active === "budget" && <PlaceholderPage title="Budget" />}
       </main>
 
 
@@ -128,6 +84,57 @@ export default function App() {
     </div>
   );
 }
+
+/* ---------- Primary Components ---------- */
+/* ---------- AI-DO (Home Page) ---------- */
+function AiDoHome() {
+  return (
+    <section className="rounded-3xl border border-slate-200/70 p-8 shadow-sm">
+      <h1 className="text-4xl font-bold tracking-tight">Welcome to AI-Do</h1>
+      <p className="mt-3 text-lg text-slate-600">
+        Your all-in-one wedding planning assistant. Stay on top of tasks, budget
+        wisely, and create beautiful inspiration — all from one place.
+      </p>
+
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <FeatureCard
+          title="Generate"
+          desc="Create décor & invite mockups with the Creative Assistant."
+          icon="🖼️"
+        />
+        <FeatureCard
+          title="Chat"
+          desc="Ask planning questions 24/7 with the AI Chatbot."
+          icon="💬"
+        />
+        <FeatureCard
+          title="Calendar"
+          desc="Deadlines and milestones auto-organized for you."
+          icon="📅"
+        />
+        <FeatureCard
+          title="Budget"
+          desc="Track categories and visualize spend vs. plan."
+          icon="💸"
+        />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Placeholder pages ---------- */
+function PlaceholderPage({ title }: { title: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <h1 className="text-5xl font-bold text-slate-800">{title}</h1>
+      <p className="mt-3 text-slate-500">
+        This is the {title.toLowerCase()} page. Content coming soon!
+      </p>
+    </div>
+  );
+}
+
+
 
 function FeatureCard({ title, desc, icon, active }: { title: string; desc: string; icon: string; active?: boolean }) {
   return (
