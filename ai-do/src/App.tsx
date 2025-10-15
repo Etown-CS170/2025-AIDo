@@ -38,7 +38,7 @@ export default function App() {
                       ? "bg-white text-slate-900 shadow-sm"
                       : "text-slate-700/90 hover:text-slate-900",
                   ].join(" ")}
-                >
+                > 
                   {item.label}
                 </button>
               </li>
