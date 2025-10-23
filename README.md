@@ -19,8 +19,24 @@ git clone https://github.com/Etown-CS170/2025-AIDo.git
 node -v
 npm -v
 ```
-3. (Future) Set up .env
-4. Start the website on http://localhost:5173/
+3. Database setup
+```
+---TODO: TEST BELOW---
+docker run --name aido-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5431:5432 -d postgres
+
+# Windows
+$env:PGPASSWORD='mysecretpassword'
+psql -h 127.0.0.1 -p 5431 -U postgres -d postgres -f .\ai-do\public\database\init.sql
+```
+4. Set up .env
+```
+PGHOST=127.0.0.1
+PGPORT=5431
+PGUSER=postgres
+PGPASSWORD=mysecretpassword
+PGDATABASE=aido_db
+```
+5. Start the website on http://localhost:5173/
 ```
 cd ai-do
 npm install
