@@ -20,6 +20,7 @@ type NavKey = typeof NAV_ITEMS[number]["key"];
 
 export default function App() {
   const [active, setActive] = useState<NavKey>("ai-do");
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-slate-800">
@@ -72,15 +73,18 @@ export default function App() {
             />
           </div>
           
-          {/* Logout Button */}
+          {/* Login Button */}
           <button
-            onClick={() => console.log('Logout clicked')}
+            onClick={() => setShowLoginModal(true)}
             className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-white/50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
           >
-            LOGOUT
+            LOGIN
           </button>
         </div>
       </footer>
+
+      {/* Login Modal */}
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 }
@@ -147,6 +151,98 @@ function FeatureCard({ title, desc, icon, active }: { title: string; desc: strin
       <div className="text-3xl" aria-hidden>{icon}</div>
       <h3 className="mt-2 text-lg font-semibold">{title}</h3>
       <p className="mt-1 text-sm text-slate-600">{desc}</p>
+    </div>
+  );
+}
+
+/* ---------- Login Modal ---------- */
+function LoginModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle login logic here
+    console.log("Login attempt:", { email, password });
+    // For now, just close the modal
+    onClose();
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          aria-label="Close"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Modal content */}
+        <h2 className="text-2xl font-bold text-slate-800">Welcome Back</h2>
+        <p className="mt-2 text-sm text-slate-600">Sign in to continue to AI-Do</p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-rose-400 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-slate-600">
+            Don't have an account?{" "}
+            <button
+              onClick={onClose}
+              className="font-semibold text-rose-400 transition-colors hover:text-rose-500 focus:outline-none focus-visible:underline"
+            >
+              Sign Up
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
