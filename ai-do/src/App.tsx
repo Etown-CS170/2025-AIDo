@@ -21,6 +21,7 @@ type NavKey = typeof NAV_ITEMS[number]["key"];
 export default function App() {
   const [active, setActive] = useState<NavKey>("ai-do");
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-slate-800">
@@ -84,7 +85,26 @@ export default function App() {
       </footer>
 
       {/* Login Modal */}
-      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      {showLoginModal && (
+        <LoginModal 
+          onClose={() => setShowLoginModal(false)} 
+          onSwitchToSignup={() => {
+            setShowLoginModal(false);
+            setShowSignUpModal(true);
+          }}
+        />
+      )}
+
+      {/* Signup Modal */}
+      {showSignUpModal && (
+        <SignupModal 
+          onClose={() => setShowSignUpModal(false)}
+          onSwitchToLogin={() => {
+            setShowSignUpModal(false);
+            setShowLoginModal(true);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -155,8 +175,8 @@ function FeatureCard({ title, desc, icon, active }: { title: string; desc: strin
   );
 }
 
-/* ---------- Login Modal ---------- */
-function LoginModal({ onClose }: { onClose: () => void }) {
+/* ---------- Login/Signup Modals ---------- */
+function LoginModal({ onClose, onSwitchToSignup }: { onClose: () => void; onSwitchToSignup: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -235,7 +255,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
           <p className="text-sm text-slate-600">
             Don't have an account?{" "}
             <button
-              onClick={onClose}
+              onClick={onSwitchToSignup}
               className="font-semibold text-rose-400 transition-colors hover:text-rose-500 focus:outline-none focus-visible:underline"
             >
               Sign Up
@@ -246,3 +266,152 @@ function LoginModal({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+
+function SignupModal({ onClose, onSwitchToLogin }: { onClose: () => void; onSwitchToLogin: () => void }) {
+  const [fname, setFirst] = useState("");
+  const [lname, setLast] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      alert("Passwords don't match!");
+      return;
+    }
+    
+    // Handle signup logic here
+    console.log("Signup attempt:", { name, email, password });
+    // For now, just close the modal
+    onClose();
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          aria-label="Close"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Modal content */}
+        <h2 className="text-2xl font-bold text-slate-800">Create Account</h2>
+        <p className="mt-2 text-sm text-slate-600">Join AI-Do to start planning your perfect wedding</p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label htmlFor="signup-fname" className="block text-sm font-medium text-slate-700">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="signup-fname"
+              value={fname}
+              onChange={(e) => setFirst(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="Jane"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="signup-lname" className="block text-sm font-medium text-slate-700">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="signup-lname"
+              value={lname}
+              onChange={(e) => setLast(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="Doe"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="signup-email" className="block text-sm font-medium text-slate-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="signup-email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="signup-password" className="block text-sm font-medium text-slate-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="signup-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="••••••••"
+              minLength={8}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-slate-700">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="signup-confirm-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              placeholder="••••••••"
+              minLength={8}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-rose-400 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+          >
+            Create Account
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-slate-600">
+            Already have an account?{" "}
+            <button
+              onClick={onSwitchToLogin}
+              className="font-semibold text-rose-400 transition-colors hover:text-rose-500 focus:outline-none focus-visible:underline"
+            >
+              Sign In
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
