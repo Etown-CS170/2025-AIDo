@@ -10,7 +10,7 @@ const { Pool } = pkg;
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: ['http://localhost:5174'], credentials: true }));
+app.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -51,11 +51,11 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const { rows } = await pool.query('SELECT userId, email, password, firstName, lastName FROM "users" WHERE email=$1', [email]);
-    if (!rows.length) return res.status(401).json({ error: 'invalid credentials' });
+    if (!rows.length) return res.status(401).json({ error: 'Invalid Credentials' });
 
     const user = rows[0];
     const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ error: 'invalid credentials' });
+    if (!ok) return res.status(401).json({ error: 'Invalid Credentials' });
 
     const token = signToken({ userId: user.userid, email: user.email });
     res.json({
