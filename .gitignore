@@ -1,5 +1,6 @@
 # Custom ignores
 postgres-data/
+server/node_modules/
 
 # Generated Ignores
 # Byte-compiled / optimized / DLL files

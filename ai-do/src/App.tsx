@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Simple tab-based demo so this file can preview without react-router.
 // Swap the tabs for <NavLink> from react-router-dom in your app.
@@ -11,17 +11,57 @@ const NAV_ITEMS = [
   { key: "budget", label: "BUDGET" },
 ] as const;
 
-const FOOT_ITEMS = [
-  { key: "settings", label: "SETTINGS" },
-  { key: "logout", label: "LOGOUT" },
-]
-
 type NavKey = typeof NAV_ITEMS[number]["key"];
+
+interface User {
+  id?: string;
+  name: string;
+  email: string;
+}
 
 export default function App() {
   const [active, setActive] = useState<NavKey>("ai-do");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Handle login
+  const handleLogin = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setShowLoginModal(false);
+  };
+
+  // Handle signup
+  const handleSignup = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setShowSignUpModal(false);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-slate-600">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-slate-800">
@@ -52,10 +92,10 @@ export default function App() {
       {/* Informational Home Section */}
       <main className="flex-grow mx-auto max-w-5xl px-6 py-16 pb-24">
         {active === "ai-do" && <AiDoHome />}
-        {active === "generate" && <PlaceholderPage title="Generate" />}
-        {active === "chat" && <PlaceholderPage title="Chat" />}
-        {active === "calendar" && <PlaceholderPage title="Calendar" />}
-        {active === "budget" && <PlaceholderPage title="Budget" />}
+        {active === "generate" && <PlaceholderPage title="Generate" user={user} onLoginClick={() => setShowLoginModal(true)} />}
+        {active === "chat" && <PlaceholderPage title="Chat" user={user} onLoginClick={() => setShowLoginModal(true)} />}
+        {active === "calendar" && <PlaceholderPage title="Calendar" user={user} onLoginClick={() => setShowLoginModal(true)} />}
+        {active === "budget" && <PlaceholderPage title="Budget" user={user} onLoginClick={() => setShowLoginModal(true)} />}
       </main>
 
 
@@ -74,13 +114,27 @@ export default function App() {
             />
           </div>
           
-          {/* Login Button */}
-          <button
-            onClick={() => setShowLoginModal(true)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-white/50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
-          >
-            LOGIN
-          </button>
+          {/* Login/User Section */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-slate-700">
+                Welcome, <span className="font-medium">{user.name}</span>
+              </span>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-white/50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+              >
+                LOGOUT
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-white/50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+            >
+              LOGIN
+            </button>
+          )}
         </div>
       </footer>
 
@@ -92,6 +146,7 @@ export default function App() {
             setShowLoginModal(false);
             setShowSignUpModal(true);
           }}
+          onLogin={handleLogin}
         />
       )}
 
@@ -103,6 +158,7 @@ export default function App() {
             setShowSignUpModal(false);
             setShowLoginModal(true);
           }}
+          onSignup={handleSignup}
         />
       )}
     </div>
@@ -147,12 +203,38 @@ function AiDoHome() {
 }
 
 /* ---------- Placeholder pages ---------- */
-function PlaceholderPage({ title }: { title: string }) {
+function PlaceholderPage({ title, user, onLoginClick }: { 
+  title: string; 
+  user: User | null;
+  onLoginClick: () => void;
+}) {
+  // If user is not logged in, show login prompt
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm max-w-md">
+          <div className="text-5xl mb-4">🔒</div>
+          <h1 className="text-3xl font-bold text-slate-800">{title}</h1>
+          <p className="mt-3 text-slate-600">
+            Please sign in to access the {title.toLowerCase()} feature.
+          </p>
+          <button
+            onClick={onLoginClick}
+            className="mt-6 rounded-lg bg-rose-400 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+          >
+            Sign In to Continue
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is logged in, show the page content
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
       <h1 className="text-5xl font-bold text-slate-800">{title}</h1>
       <p className="mt-3 text-slate-500">
-        This is the {title.toLowerCase()} page. Content coming soon!
+        Welcome, {user.name}! This is the {title.toLowerCase()} page. Content coming soon!
       </p>
     </div>
   );
@@ -176,16 +258,46 @@ function FeatureCard({ title, desc, icon, active }: { title: string; desc: strin
 }
 
 /* ---------- Login/Signup Modals ---------- */
-function LoginModal({ onClose, onSwitchToSignup }: { onClose: () => void; onSwitchToSignup: () => void }) {
+function LoginModal({ onClose, onSwitchToSignup, onLogin }: { 
+  onClose: () => void; 
+  onSwitchToSignup: () => void;
+  onLogin: (userData: User) => void;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
-    // For now, just close the modal
-    onClose();
+    setError("");
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data?.error || "Login failed");
+        return;
+      }
+
+      const data = await response.json();
+      if (data?.token) localStorage.setItem("aido_token", data.token);
+
+      const user: User = {
+        id: data.user.id,
+        name: data.user.firstName + " " + data.user.lastName,
+        email: data.user.email
+      };
+
+      onLogin(user);
+            
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    }
   };
 
   return (
@@ -211,6 +323,12 @@ function LoginModal({ onClose, onSwitchToSignup }: { onClose: () => void; onSwit
         {/* Modal content */}
         <h2 className="text-2xl font-bold text-slate-800">Welcome Back</h2>
         <p className="mt-2 text-sm text-slate-600">Sign in to continue to AI-Do</p>
+
+        {error && (
+          <div className="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -267,26 +385,64 @@ function LoginModal({ onClose, onSwitchToSignup }: { onClose: () => void; onSwit
   );
 }
 
-function SignupModal({ onClose, onSwitchToLogin }: { onClose: () => void; onSwitchToLogin: () => void }) {
+function SignupModal({ onClose, onSwitchToLogin, onSignup }: { 
+  onClose: () => void; 
+  onSwitchToLogin: () => void;
+  onSignup: (userData: User) => void;
+}) {
   const [fname, setFirst] = useState("");
   const [lname, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate passwords match
+    setError(null);
+
     if (password !== confirmPassword) {
-      alert("Passwords don't match!");
+      setError("Passwords don't match.");
       return;
     }
-    
-    // Handle signup logic here
-    console.log("Signup attempt:", { name, email, password });
-    // For now, just close the modal
-    onClose();
+
+    try {
+      setLoading(true);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: fname,
+          lastName: lname,
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError(data?.error || "Sign up failed");
+        return;
+      }
+
+      // Save token
+      if (data?.token) localStorage.setItem("aido_token", data.token);
+      
+      // Create user object and call onSignup
+      const newUser: User = {
+        id: data?.user?.id || data?.id,
+        name: `${fname} ${lname}`,
+        email: email
+      };
+      
+      onSignup(newUser);
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -312,6 +468,12 @@ function SignupModal({ onClose, onSwitchToLogin }: { onClose: () => void; onSwit
         {/* Modal content */}
         <h2 className="text-2xl font-bold text-slate-800">Create Account</h2>
         <p className="mt-2 text-sm text-slate-600">Join AI-Do to start planning your perfect wedding</p>
+
+        {error && (
+          <div className="mb-2 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 border border-rose-200">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -393,9 +555,10 @@ function SignupModal({ onClose, onSwitchToLogin }: { onClose: () => void; onSwit
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full rounded-lg bg-rose-400 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
           >
-            Create Account
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
