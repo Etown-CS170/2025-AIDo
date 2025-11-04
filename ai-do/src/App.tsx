@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-
-// Simple tab-based demo so this file can preview without react-router.
-// Swap the tabs for <NavLink> from react-router-dom in your app.
+import Chat from "./pages/Chat";
 
 const NAV_ITEMS = [
   { key: "generate", label: "GENERATE" },
@@ -90,14 +88,14 @@ export default function App() {
       </header>
 
       {/* Informational Home Section */}
-      <main className="flex-grow mx-auto max-w-5xl px-6 py-16 pb-24">
+      <main className={active === "chat" && user ? "h-[calc(100vh-120px)]" : "flex-grow mx-auto max-w-5xl px-6 py-16 pb-24"}>
         {active === "ai-do" && <AiDoHome />}
+        {/* TODO: Make placeholder page only appear if user is not logged in */}
         {active === "generate" && <PlaceholderPage title="Generate" user={user} onLoginClick={() => setShowLoginModal(true)} />}
-        {active === "chat" && <PlaceholderPage title="Chat" user={user} onLoginClick={() => setShowLoginModal(true)} />}
+        {active === "chat" && (user ? <Chat /> : <PlaceholderPage title="Chat" user={user} onLoginClick={() => setShowLoginModal(true)} />)}
         {active === "calendar" && <PlaceholderPage title="Calendar" user={user} onLoginClick={() => setShowLoginModal(true)} />}
         {active === "budget" && <PlaceholderPage title="Budget" user={user} onLoginClick={() => setShowLoginModal(true)} />}
       </main>
-
 
       {/* Footer */}
       <footer className="fixed bottom-0 z-50 w-full border-t border-rose-100/60 bg-rose-100/60 backdrop-blur supports-[backdrop-filter]:bg-rose-100/40">
