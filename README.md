@@ -28,15 +28,38 @@ docker run --name aido-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5431:54
 $env:PGPASSWORD='mysecretpassword'
 psql -h 127.0.0.1 -p 5431 -U postgres -d postgres -f .\ai-do\public\database\init.sql
 ```
-4. Set up .env
+4. Set up environment variables
+
+**Backend `.env`** (in `server/` directory):
+```env
+DATABASE_URL=postgresql://postgres:mypass@127.0.0.1:5431/aido_db
+JWT_SECRET=secret-jwt-key
+PORT=5001
+OPENAI_API_KEY=your-openai-api-key-here
 ```
-PGHOST=127.0.0.1
-PGPORT=5431
-PGUSER=postgres
-PGPASSWORD=mysecretpassword
-PGDATABASE=aido_db
+
+**Frontend `.env`** (in `ai-do/` directory):
+```env
+VITE_API_URL=http://localhost:5001
 ```
-5. Start the website on http://localhost:5173/
+
+5. Install dependencies and start servers
+
+Backend:
+```
+cd server
+npm install
+npm run dev
+```
+
+Frontend (in a new terminal):
+```
+cd ai-do
+npm install
+npm run dev
+```
+
+The website will be available on http://localhost:5173/
 ```
 cd ai-do
 npm install
