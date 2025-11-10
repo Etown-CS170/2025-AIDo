@@ -339,7 +339,10 @@ export default function Chat() {
                       : "bg-gray-200 text-slate-800 rounded-bl-sm",
                   ].join(" ")}
                 >
-                  <p className="text-sm leading-relaxed">{message.text}</p>
+                  <div 
+                    className="text-sm leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: message.text }}
+                  />
                   <span
                     className={[
                       "text-xs mt-1 block",

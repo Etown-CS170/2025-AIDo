@@ -5,9 +5,19 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pkg from 'pg';
 import OpenAI from 'openai';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const { Pool } = pkg;
+
+// Load few-shot examples
+const fewShotExamples = JSON.parse(
+  readFileSync(join(__dirname, 'few-shot-examples.json'), 'utf-8')
+);
 
 const app = express();
 app.use(express.json());
@@ -244,17 +254,23 @@ app.post('/api/conversations/:conversationId/messages', authenticateToken, async
     
     // Get conversation history for context
     const historyQuery = await pool.query(
-      'SELECT question, answer FROM "messages" WHERE chatId = $1 ORDER BY timestamp ASC LIMIT 10',
+      'SELECT question, answer FROM "messages" WHERE chatId = $1 ORDER BY timestamp ASC LIMIT 5',
       [conversationId]
     );
     
-    // Build conversation history for OpenAI
+    // Build conversation history for OpenAI with few-shot examples
     const messages = [
       {
         role: 'system',
-        content: 'You are a helpful AI wedding planning assistant. Your name is AI-Do. You help couples plan their perfect wedding by providing advice on venues, budgets, timelines, guest lists, decorations, and all aspects of wedding planning. Be friendly, supportive, and practical in your responses.'
+        content: `${fewShotExamples.systemContext.role} ${fewShotExamples.systemContext.principles.join(' ')} ${fewShotExamples.systemContext.formattingInstructions}`
       }
     ];
+    
+    // Add few-shot examples to improve response quality
+    fewShotExamples.examples.forEach(example => {
+      messages.push({ role: 'user', content: example.user });
+      messages.push({ role: 'assistant', content: example.assistant });
+    });
     
     // Add conversation history
     historyQuery.rows.forEach(row => {
